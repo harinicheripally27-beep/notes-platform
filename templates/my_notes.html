@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}My Notes — NoteShare{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title">My Notes</h1>
+    <p class="page-sub">{{ notes|length }} note{{ 's' if notes|length != 1 }} uploaded</p>
+  </div>
+</div>
+
+<div class="container">
+  {% if notes %}
+  <div class="my-notes-table-wrap">
+    <table class="my-notes-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Subject</th>
+          <th>Uploaded</th>
+          <th>Downloads</th>
+          <th>Likes</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for note in notes %}
+        <tr>
+          <td>
+            <a href="{{ url_for('note_detail', note_id=note.id) }}" class="table-note-link">
+              {{ note.title }}
+            </a>
+          </td>
+          <td><span class="note-subject-tag small">{{ note.subject_name }}</span></td>
+          <td class="muted">{{ note.created_at[:10] }}</td>
+          <td class="center">⬇ {{ note.downloads }}</td>
+          <td class="center">❤ {{ note.likes }}</td>
+          <td>
+            <div class="table-actions">
+              <a href="{{ url_for('download', note_id=note.id) }}" class="btn-sm btn-ghost">Download</a>
+              <form method="POST" action="{{ url_for('delete_note', note_id=note.id) }}" style="display:inline"
+                    onsubmit="return confirm('Delete this note permanently?')">
+                <button type="submit" class="btn-sm btn-danger-sm">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">📂</div>
+    <h3>You haven't uploaded any notes yet</h3>
+    <p>Start contributing to the community!</p>
+    <a href="{{ url_for('upload') }}" class="btn btn-primary">Upload Your First Notes</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

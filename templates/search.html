@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Search — NoteShare{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title">Search Notes</h1>
+  </div>
+</div>
+
+<div class="container narrow-md">
+  <form method="GET" class="search-bar-form">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search by title, subject, or keyword..." class="search-input" autofocus />
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+
+  {% if query %}
+    <div class="search-meta">
+      {% if notes %}
+        Found <strong>{{ notes|length }}</strong> result{{ 's' if notes|length != 1 }} for "<em>{{ query }}</em>"
+      {% else %}
+        No results found for "<em>{{ query }}</em>"
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+<div class="container">
+  {% if notes %}
+  <div class="notes-grid">
+    {% for note in notes %}
+      {% include 'partials/note_card.html' %}
+    {% endfor %}
+  </div>
+  {% elif query %}
+  <div class="empty-state">
+    <div class="empty-icon">🔍</div>
+    <h3>No results found</h3>
+    <p>Try different keywords or browse by subject.</p>
+    <a href="{{ url_for('browse') }}" class="btn btn-primary">Browse All Notes</a>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">💡</div>
+    <h3>What are you looking for?</h3>
+    <p>Search by subject name, topic, or keywords from the note title.</p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}NoteShare{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar">
+  <a href="{{ url_for('index') }}" class="brand">
+    <span class="brand-icon">📚</span>
+    <span class="brand-name">Note<span class="accent">Share</span></span>
+  </a>
+
+  <div class="nav-links">
+    <a href="{{ url_for('browse') }}" class="nav-link {% if request.endpoint=='browse' %}active{% endif %}">Browse</a>
+    <a href="{{ url_for('search') }}" class="nav-link {% if request.endpoint=='search' %}active{% endif %}">Search</a>
+    {% if session.user_id %}
+      <a href="{{ url_for('upload') }}" class="nav-link {% if request.endpoint=='upload' %}active{% endif %}">Upload</a>
+      <a href="{{ url_for('my_notes') }}" class="nav-link {% if request.endpoint=='my_notes' %}active{% endif %}">My Notes</a>
+      <div class="nav-user">
+        <span class="user-chip">{{ session.username[0].upper() }}</span>
+        <span class="username">{{ session.username }}</span>
+        <a href="{{ url_for('logout') }}" class="btn-sm btn-ghost">Logout</a>
+      </div>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="btn-sm btn-ghost">Login</a>
+      <a href="{{ url_for('register') }}" class="btn-sm btn-primary">Register</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- ── Flash Messages ── -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">
+          <span>{{ msg }}</span>
+          <button onclick="this.parentElement.remove()">✕</button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<!-- ── Page Content ── -->
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<!-- ── Footer ── -->
+<footer class="footer">
+  <div class="footer-inner">
+    <span class="brand-name">Note<span class="accent">Share</span></span>
+    <span class="footer-tagline">Knowledge shared, knowledge multiplied.</span>
+    <div class="footer-links">
+      <a href="{{ url_for('browse') }}">Browse</a>
+      <a href="{{ url_for('search') }}">Search</a>
+      <a href="{{ url_for('upload') }}">Upload</a>
+    </div>
+  </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

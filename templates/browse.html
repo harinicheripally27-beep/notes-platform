@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Browse Notes — NoteShare{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div class="container">
+    <h1 class="page-title">Browse Notes</h1>
+    <p class="page-sub">{{ notes|length }} note{{ 's' if notes|length != 1 }} found</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="browse-layout">
+
+    <!-- Sidebar Filters -->
+    <aside class="filter-sidebar">
+      <h3 class="filter-title">Subjects</h3>
+      <a href="{{ url_for('browse') }}" class="filter-item {% if not selected %}active{% endif %}">
+        All Subjects
+      </a>
+      {% for s in subjects %}
+      <a href="{{ url_for('browse', subject_id=s.id) }}"
+         class="filter-item {% if selected == s.id|string %}active{% endif %}">
+        {{ s.name }}
+      </a>
+      {% endfor %}
+    </aside>
+
+    <!-- Notes Grid -->
+    <div class="browse-content">
+      {% if notes %}
+      <div class="notes-grid">
+        {% for note in notes %}
+          {% include 'partials/note_card.html' %}
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>No notes in this subject yet</h3>
+        <p>Be the first to contribute!</p>
+        {% if session.user_id %}
+          <a href="{{ url_for('upload') }}" class="btn btn-primary">Upload Notes</a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

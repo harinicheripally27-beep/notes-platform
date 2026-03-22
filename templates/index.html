@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}NoteShare — Student Notes Platform{% endblock %}
+{% block content %}
+
+<!-- ── Hero ── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">✦ Open Knowledge Platform</div>
+    <h1 class="hero-title">Share Notes.<br><span class="accent">Excel Together.</span></h1>
+    <p class="hero-sub">A centralized hub for students to upload, discover, and download subject-wise study notes. AI-powered recommendations help you find what you need, fast.</p>
+    <div class="hero-cta">
+      <a href="{{ url_for('browse') }}" class="btn btn-primary btn-lg">Browse Notes</a>
+      {% if not session.user_id %}
+        <a href="{{ url_for('register') }}" class="btn btn-outline btn-lg">Join Free</a>
+      {% else %}
+        <a href="{{ url_for('upload') }}" class="btn btn-outline btn-lg">Upload Notes</a>
+      {% endif %}
+    </div>
+    <div class="hero-stats">
+      <div class="stat-pill">
+        <span class="stat-num">{{ total_notes }}</span>
+        <span class="stat-label">Notes</span>
+      </div>
+      <div class="stat-divider">·</div>
+      <div class="stat-pill">
+        <span class="stat-num">{{ total_users }}</span>
+        <span class="stat-label">Contributors</span>
+      </div>
+      <div class="stat-divider">·</div>
+      <div class="stat-pill">
+        <span class="stat-num">15</span>
+        <span class="stat-label">Subjects</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="floating-card fc1">📐 Calculus Notes</div>
+    <div class="floating-card fc2">💻 OS Concepts</div>
+    <div class="floating-card fc3">⚗️ Organic Chem</div>
+    <div class="floating-card fc4">🧠 ML Basics</div>
+  </div>
+</section>
+
+<!-- ── Subjects ── -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Browse by Subject</h2>
+      <p class="section-sub">Jump straight to what you're studying</p>
+    </div>
+    <div class="subjects-grid">
+      {% for s in subjects %}
+      <a href="{{ url_for('browse', subject_id=s.id) }}" class="subject-card">
+        <span class="subject-icon">{{ ['📐','⚛️','⚗️','🧬','💻','📖','🏛️','📊','🗂️','🔢','🖥️','🗄️','🌐','🤖','📝'][loop.index0 % 15] }}</span>
+        <span class="subject-name">{{ s.name }}</span>
+        <span class="subject-count">{{ s.note_count }} notes</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ── Top Notes ── -->
+{% if top_notes %}
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">🔥 Most Downloaded</h2>
+      <a href="{{ url_for('browse') }}" class="see-all">See all →</a>
+    </div>
+    <div class="notes-grid">
+      {% for note in top_notes %}
+        {% include 'partials/note_card.html' %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ── Recent Notes ── -->
+{% if recent_notes %}
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">🕐 Recently Added</h2>
+      <a href="{{ url_for('browse') }}" class="see-all">See all →</a>
+    </div>
+    <div class="notes-grid">
+      {% for note in recent_notes %}
+        {% include 'partials/note_card.html' %}
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if not top_notes %}
+<section class="section">
+  <div class="container">
+    <div class="empty-state hero-empty">
+      <div class="empty-icon">📂</div>
+      <h3>No notes yet — be the first!</h3>
+      <p>Upload your notes and help fellow students.</p>
+      {% if session.user_id %}
+        <a href="{{ url_for('upload') }}" class="btn btn-primary">Upload Notes</a>
+      {% else %}
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

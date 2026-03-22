@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }} — NoteShare{% endblock %}
+{% block content %}
+
+<div class="container">
+  <div class="detail-layout">
+
+    <!-- Main Note -->
+    <div class="detail-main">
+      <div class="detail-breadcrumb">
+        <a href="{{ url_for('browse') }}">Browse</a> /
+        <a href="{{ url_for('browse', subject_id=note.subject_id) }}">{{ note.subject_name }}</a>
+      </div>
+
+      <div class="detail-card">
+        <div class="detail-header">
+          <span class="note-subject-tag large">{{ note.subject_name }}</span>
+          <h1 class="detail-title">{{ note.title }}</h1>
+          {% if note.description %}
+            <p class="detail-desc">{{ note.description }}</p>
+          {% endif %}
+        </div>
+
+        <div class="detail-meta">
+          <div class="meta-row">
+            <div class="author-info">
+              <span class="author-chip large">{{ note.username[0].upper() }}</span>
+              <div>
+                <div class="author-name">{{ note.username }}</div>
+                <div class="upload-date">Uploaded {{ note.created_at[:10] }}</div>
+              </div>
+            </div>
+            <div class="note-stats">
+              <span class="stat-badge">⬇ {{ note.downloads }} downloads</span>
+              <span class="stat-badge" id="likeBadge">❤ <span id="likeCount">{{ note.likes }}</span> likes</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <a href="{{ url_for('download', note_id=note.id) }}" class="btn btn-primary btn-lg">
+            ⬇ Download PDF
+          </a>
+          {% if session.user_id %}
+          <button class="btn btn-outline btn-lg" onclick="likeNote({{ note.id }})" id="likeBtn">
+            ❤ Like
+          </button>
+          {% endif %}
+          {% if session.user_id == note.user_id %}
+          <form method="POST" action="{{ url_for('delete_note', note_id=note.id) }}"
+                onsubmit="return confirm('Delete this note permanently?')">
+            <button type="submit" class="btn btn-danger btn-lg">🗑 Delete</button>
+          </form>
+          {% endif %}
+        </div>
+
+        <!-- PDF Preview -->
+        <div class="pdf-preview-section">
+          <h3 class="preview-heading">📄 Preview</h3>
+          <div class="pdf-embed-wrapper">
+            <iframe src="{{ url_for('download', note_id=note.id) }}"
+                    class="pdf-embed" title="PDF Preview">
+              <p>Your browser doesn't support PDF preview.
+                 <a href="{{ url_for('download', note_id=note.id) }}">Download instead</a>.
+              </p>
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar: AI Recommendations -->
+    <aside class="detail-sidebar">
+      <div class="rec-panel">
+        <div class="rec-header">
+          <span class="rec-badge">🤖 AI</span>
+          <h3>Recommended for you</h3>
+          <p class="rec-sub">Based on content similarity</p>
+        </div>
+        {% if recommendations %}
+          <div class="rec-list">
+            {% for rec in recommendations %}
+            <a href="{{ url_for('note_detail', note_id=rec.id) }}" class="rec-card">
+              <span class="rec-subject">{{ rec.subject_name }}</span>
+              <p class="rec-title">{{ rec.title }}</p>
+              <div class="rec-meta">
+                <span>by {{ rec.username }}</span>
+                <span>⬇ {{ rec.downloads }}</span>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="rec-empty">
+            <p>Upload more notes to get personalized recommendations!</p>
+          </div>
+        {% endif %}
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script>
+function likeNote(noteId) {
+  fetch(`/like/${noteId}`, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('likeCount').textContent = data.likes;
+      document.getElementById('likeBtn').textContent = '❤ Liked!';
+      document.getElementById('likeBtn').disabled = true;
+    });
+}
+</script>
+{% endblock %}
